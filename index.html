@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <link href="output.css" rel="stylesheet">
+  <link href="./css/production.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'DM Sans', sans-serif; background: #000; color: #fff; }
+
+    /* ─── BACKGROUND ─── */
+    #bg-wrap {
+      position: fixed; inset: 0; z-index: 0;
+      will-change: transform;
+    }
+    #bg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #bg-overlay {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 60% 40%, rgba(20,30,80,0.55) 0%, rgba(0,0,0,0.75) 100%);
+    }
+
+    /* ─── GRAIN / SCANLINE ─── */
+    #grain {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 128px;
+    }
+    #scanline {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background: repeating-linear-gradient(to bottom, transparent 0, transparent 3px, rgba(255,255,255,0.008) 3px, rgba(255,255,255,0.008) 4px);
+    }
+
+    /* ─── SCREENS ─── */
+    /* Both screens use opacity + transform only — no display:none — so transitions work */
+    .screen {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+
+    /* ══════════════════════════════════════
+       LOADING SCREEN
+    ══════════════════════════════════════ */
+    #screen-loading {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+      pointer-events: all;
+    }
+    #screen-loading.out {
+      opacity: 0;
+      transform: translateY(-30px);
+      pointer-events: none;
+    }
+
+    .ps-logo {
+      width: 60px; height: 60px; margin-bottom: 28px;
+      opacity: 0; animation: fadeUp 0.7s 0.2s forwards;
+    }
+    .loading-title {
+      font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); font-family: 'DM Mono', monospace;
+      opacity: 0; animation: fadeUp 0.7s 0.4s forwards;
+      margin-bottom: 40px;
+    }
+    .progress-wrap {
+      width: 180px; height: 2px; background: rgba(255,255,255,0.1);
+      border-radius: 2px; overflow: hidden;
+      opacity: 0; animation: fadeUp 0.5s 0.55s forwards;
+    }
+    .progress-bar {
+      height: 100%; width: 0%; background: rgba(255,255,255,0.75);
+      border-radius: 2px;
+      /* JS will drive width directly, no CSS transition so we control timing */
+    }
+    .sys-line {
+      position: fixed; bottom: 28px;
+      font-size: 10px; font-family: 'DM Mono', monospace;
+      color: rgba(255,255,255,0.15); letter-spacing: 0.14em;
+      opacity: 0; animation: fadeUp 0.5s 0.7s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══════════════════════════════════════
+       ACCOUNT SCREEN
+    ══════════════════════════════════════ */
+    #screen-account {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      pointer-events: none;
+    }
+    #screen-account.in {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .account-header {
+      font-size: 11px; font-family: 'DM Mono', monospace;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25); margin-bottom: 48px;
+    }
+
+    /* ─── ID Card ─── */
+    .id-card {
+      position: relative;
+      width: 340px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 34px 30px 26px;
+      cursor: pointer;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: box-shadow 0.35s ease, border-color 0.35s ease;
+      /* transform controlled by JS for tilt; no CSS transition on transform here */
+    }
+    /* top glow line */
+    .id-card::after {
+      content: '';
+      position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+    }
+    /* shimmer layer */
+    .id-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.055) 0%, transparent 55%);
+      opacity: 0; transition: opacity 0.3s;
+      border-radius: inherit; pointer-events: none;
+    }
+    .id-card:hover::before { opacity: 1; }
+    .id-card.selected {
+      border-color: rgba(255,255,255,0.4);
+      box-shadow: 0 0 70px rgba(110,150,255,0.15), 0 28px 72px rgba(0,0,0,0.55);
+    }
+    .id-card.selected::before { opacity: 1; }
+
+    /* avatar row */
+    .avatar-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+    .avatar {
+      width: 68px; height: 68px; border-radius: 15px; flex-shrink: 0;
+      background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #1a2a6c 100%);
+      background-size: 200% 200%;
+      animation: avatarShift 6s ease infinite;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 700; color: rgba(255,255,255,0.88);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+    @keyframes avatarShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .avatar-name {
+      font-size: 19px; font-weight: 600; letter-spacing: -0.3px;
+      color: #fff; margin-bottom: 4px;
+    }
+    .avatar-handle {
+      font-size: 11px; font-family: 'DM Mono', monospace;
+      color: rgba(255,255,255,0.32); letter-spacing: 0.07em;
+    }
+
+    /* fields */
+    .id-fields {
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding-top: 18px; margin-bottom: 26px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .id-field { display: flex; justify-content: space-between; align-items: center; }
+    .id-field-label {
+      font-size: 10px; font-family: 'DM Mono', monospace;
+      color: rgba(255,255,255,0.25); letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .id-field-value { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.62); }
+
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #4ade80;
+      display: inline-block; margin-right: 6px;
+      box-shadow: 0 0 8px rgba(74,222,128,0.55);
+      animation: pulseDot 2.5s ease infinite;
+    }
+    @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    /* enter button */
+    .enter-btn {
+      width: 100%; padding: 12px 0; border-radius: 11px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.055);
+      font-size: 11px; font-family: 'DM Mono', monospace;
+      font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.7); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: background 0.22s, border-color 0.22s, color 0.22s;
+    }
+    .enter-btn:hover {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.32);
+      color: #fff;
+    }
+    .enter-btn:active { transform: scale(0.97); }
+    .x-btn {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.45);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px;
+    }
+
+    .account-hint {
+      margin-top: 22px;
+      font-size: 10px; font-family: 'DM Mono', monospace;
+      color: rgba(255,255,255,0.18); letter-spacing: 0.12em;
+    }
+
+    /* ─── Overlays ─── */
+    #flash {
+      position: fixed; inset: 0; z-index: 99;
+      background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.12s;
+    }
+    #flash.pop { opacity: 0.08; }
+
+    #exit-veil {
+      position: fixed; inset: 0; z-index: 98;
+      background: #000; opacity: 0; pointer-events: none; transition: opacity 0.55s ease;
+    }
+    #exit-veil.active { opacity: 1; }
+
+    #sys-clock {
+      position: fixed; top: 20px; right: 34px; z-index: 20;
+      font-size: 11px; font-family: 'DM Mono', monospace;
+      color: rgba(255,255,255,0.2); letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bg-wrap">
+    <canvas id="bg-canvas"></canvas>
+    <div id="bg-overlay"></div>
+  </div>
+  <div id="grain"></div>
+  <div id="scanline"></div>
+  <div id="flash"></div>
+  <div id="exit-veil"></div>
+  <div id="sys-clock"></div>
+
+  <!-- ══ LOADING ══ -->
+  <div class="screen" id="screen-loading">
+    <div class="ps-logo">
+      <svg viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M36 64V30l9 2.8v26l11-3.5V18l9 2.8v38L36 64z" fill="rgba(255,255,255,0.92)"/>
+        <path d="M36 64l29-9.4 4 7.8-29 9.6z" fill="rgba(255,255,255,0.45)"/>
+        <path d="M18 60l9-2.8v7l23-7.2v8L18 75z" fill="rgba(255,255,255,0.72)"/>
+      </svg>
+    </div>
+    <div class="loading-title">Initializing</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="sys-line">PORTFOLIO OS · v1.0.0</div>
+  </div>
+
+  <!-- ══ ACCOUNT ══ -->
+  <div class="screen" id="screen-account">
+    <div class="account-header">Select User</div>
+
+    <div class="id-card" id="id-card" tabindex="0">
+      <div class="avatar-wrap">
+        <div class="avatar">YN</div>
+        <div>
+          <div class="avatar-name">Your Name</div>
+          <div class="avatar-handle">@yourhandle</div>
+        </div>
+      </div>
+
+      <div class="id-fields">
+        <div class="id-field">
+          <span class="id-field-label">Role</span>
+          <span class="id-field-value">Full-Stack Developer</span>
+        </div>
+        <div class="id-field">
+          <span class="id-field-label">Status</span>
+          <span class="id-field-value"><span class="status-dot"></span>Available</span>
+        </div>
+        <div class="id-field">
+          <span class="id-field-label">Based in</span>
+          <span class="id-field-value">Your City, PH</span>
+        </div>
+        <div class="id-field">
+          <span class="id-field-label">Projects</span>
+          <span class="id-field-value">6 works</span>
+        </div>
+      </div>
+
+      <button class="enter-btn" id="enter-btn">
+        <span class="x-btn">×</span>
+        Enter Portfolio
+      </button>
+    </div>
+
+    <div class="account-hint">press × or enter to continue</div>
+  </div>
+
+  <script>
+  // ══ CANVAS BG ══════════════════════════════════════════════════════════
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  const bgWrap = document.getElementById('bg-wrap');
+  let W, H, particles = [];
+  let mouseX = 0, mouseY = 0, tgX = 0, tgY = 0;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    particles = [];
+    const n = Math.floor((W * H) / 12000);
+    for (let i = 0; i < n; i++) {
+      particles.push({
+        x: Math.random() * W, y: Math.random() * H,
+        r: Math.random() * 1.6 + 0.3,
+        vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
+        a: Math.random() * 0.45 + 0.07,
+        hue: Math.random() > 0.5 ? 220 : 200,
+      });
+    }
+  }
+
+  function drawBg() {
+  if (!W || !H) return; // skip if dimensions not ready
+  ctx.clearRect(0, 0, W, H);
+  const grd = ctx.createRadialGradient(W * 0.55, H * 0.35, 0, W * 0.5, H * 0.5, W * 0.9);
+  grd.addColorStop(0, 'rgba(14,22,75,1)');
+  grd.addColorStop(0.55, 'rgba(4,7,28,1)');
+  grd.addColorStop(1, 'rgba(0,0,6,1)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+
+    [
+      { x: W*0.22, y: H*0.28, r: W*0.30, c: 'rgba(28,55,200,0.07)' },
+      { x: W*0.78, y: H*0.68, r: W*0.24, c: 'rgba(75,28,180,0.06)' },
+      { x: W*0.50, y: H*0.82, r: W*0.20, c: 'rgba(18,95,195,0.05)' },
+    ].forEach(o => {
+      const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+      g.addColorStop(0, o.c); g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2); ctx.fill();
+    });
+
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `hsla(${p.hue},78%,84%,${p.a})`; ctx.fill();
+    });
+  }
+
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+function loop() {
+  tgX += (mouseX - tgX) * 0.05;
+  tgY += (mouseY - tgY) * 0.05;
+  bgWrap.style.transform = `scale(1.07) translate(${tgX*16}px,${tgY*10}px)`;
+  drawBg();
+  requestAnimationFrame(loop);
+}
+
+// first set canvas dimensions
+window.addEventListener('resize', resize);
+resize();
+
+// now start animation loop
+loop();
+
+  // ══ CLOCK ══════════════════════════════════════════════════════════════
+  const clockEl = document.getElementById('sys-clock');
+  (function tickClock() {
+    clockEl.textContent = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    setTimeout(tickClock, 10000);
+  })();
+
+  // ══ LOADING ════════════════════════════════════════════════════════════
+  const bar     = document.getElementById('progress-bar');
+  const scrLoad = document.getElementById('screen-loading');
+  const scrAcc  = document.getElementById('screen-account');
+
+  // Animate progress bar with rAF for smooth fill
+  let currentW = 0;
+  let targetW  = 0;
+
+  function animateBar() {
+  if (currentW < targetW) {
+    currentW = Math.min(currentW + 5, targetW); // faster for testing
+    bar.style.width = currentW + '%';
+    requestAnimationFrame(animateBar);
+  }
+}
+
+
+  const steps = [
+    { pct: 25,  after: 0   },
+    { pct: 50,  after: 350 },
+    { pct: 75,  after: 300 },
+    { pct: 90,  after: 280 },
+    { pct: 100, after: 250 },
+  ];
+
+  function runSteps(i) {
+    if (i >= steps.length) {
+      // All done → show account
+      setTimeout(transitionToAccount, 2000); // go to account screen after 2s
+
+      return;
+    }
+    setTimeout(() => {
+      targetW = steps[i].pct;
+      animateBar();
+      runSteps(i + 1);
+    }, steps[i].after);
+  }
+
+  // Small delay so the page/fonts are ready, then kick off
+  setTimeout(() => runSteps(0), 600);
+
+  function transitionToAccount() {
+  scrLoad.classList.add('out');           
+  setTimeout(() => {
+    scrLoad.style.display = 'none';       
+    scrAcc.classList.add('in');           
+  }, 560);
+}
+
+
+  // ══ ACCOUNT INTERACTIONS ═══════════════════════════════════════════════
+  const idCard  = document.getElementById('id-card');
+  const enterBtn= document.getElementById('enter-btn');
+  const flash   = document.getElementById('flash');
+  const veil    = document.getElementById('exit-veil');
+
+  // 3-D tilt on mouse move
+  idCard.addEventListener('mousemove', e => {
+    const r  = idCard.getBoundingClientRect();
+    const dx = (e.clientX - (r.left + r.width  / 2)) / (r.width  / 2);
+    const dy = (e.clientY - (r.top  + r.height / 2)) / (r.height / 2);
+    idCard.style.transform = `perspective(900px) rotateY(${dx*7}deg) rotateX(${-dy*5}deg) scale(1.02)`;
+  });
+  idCard.addEventListener('mouseleave', () => {
+    idCard.style.transform = '';
+  });
+
+  // Click body of card to select/deselect
+  idCard.addEventListener('click', e => {
+    if (enterBtn.contains(e.target)) return;
+    idCard.classList.toggle('selected');
+  });
+
+  function goToProjects() {
+    flash.classList.add('pop');
+    setTimeout(() => flash.classList.remove('pop'), 140);
+    setTimeout(() => {
+      veil.classList.add('active');
+      setTimeout(() => { window.location.href = 'projects.html'; }, 580);
+    }, 80);
+  }
+
+  enterBtn.addEventListener('click', goToProjects);
+
+  document.addEventListener('keydown', e => {
+    if (!scrAcc.classList.contains('in')) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToProjects(); }
+    if (e.key === 'x' || e.key === 'X') goToProjects();
+  });
+
+  idCard.addEventListener('focus', () => idCard.classList.add('selected'));
+  idCard.addEventListener('blur',  () => idCard.classList.remove('selected'));
+  </script>
+</body>
+</html>
