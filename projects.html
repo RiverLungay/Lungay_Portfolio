@@ -6,14 +6,11 @@
   <title>Portfolio — Projects</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="output.css" rel="stylesheet">
-  <!-- <link href="/src/css/projects.css" rel="stylesheet"> -->
-  <!-- <link href="projects.css" rel="stylesheet"> -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-
   <style>
-     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'DM Sans', sans-serif; background: #000; color: #fff; }
 
     /* ══ BACKGROUND ══ */
@@ -38,6 +35,136 @@
       );
     }
 
+    /* ══ SKILLS CARD ANIMATED BG ══ */
+    @keyframes skillsBgShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes skillsPulse {
+      0%, 100% { opacity: 0.7; }
+      50%       { opacity: 1; }
+    }
+    @keyframes floatDot {
+      0%   { transform: translateY(0px) translateX(0px); }
+      33%  { transform: translateY(-6px) translateX(3px); }
+      66%  { transform: translateY(3px) translateX(-4px); }
+      100% { transform: translateY(0px) translateX(0px); }
+    }
+
+    .skills-card-bg {
+      position: absolute; inset: 0;
+      /* Default: animated gradient — swap this for a gif/video below */
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e, #1a1a2e, #16213e, #0f3460);
+      background-size: 400% 400%;
+      animation: skillsBgShift 6s ease infinite;
+    }
+    /* If you want a GIF background instead, set SKILLS_BG_TYPE = 'gif' in the script */
+    .skills-card-bg.gif-mode {
+      background: none;
+      animation: none;
+    }
+    .skills-card-bg.gif-mode img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    /* Floating dots overlay on skills card */
+    .skills-dot {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      animation: floatDot linear infinite;
+    }
+
+    /* Grid lines overlay */
+    .skills-grid-overlay {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* Skills card label override */
+    .skills-card-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 28px 8px 8px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.95); text-align: center;
+      text-transform: uppercase;
+    }
+    .skills-card-icon {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
+      font-size: 28px; line-height: 1;
+      animation: skillsPulse 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 8px rgba(120,80,255,0.6));
+    }
+
+    /* ══ SKILLS MODAL ══ */
+    .skill-category {
+      margin-bottom: 20px;
+    }
+    .skill-category-title {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .skill-category-title::after {
+      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
+    }
+    .skill-chips {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .skill-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px 5px 10px; border-radius: 8px;
+      font-size: 12px; font-weight: 500; letter-spacing: 0.02em;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.80);
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      cursor: default;
+    }
+    .skill-chip:hover {
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.22);
+      transform: translateY(-1px);
+    }
+    .skill-chip-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    /* Category accent colors */
+    .cat-frontend  .skill-chip-dot { background: #818cf8; }
+    .cat-backend   .skill-chip-dot { background: #34d399; }
+    .cat-database  .skill-chip-dot { background: #fb923c; }
+    .cat-tools     .skill-chip-dot { background: #f472b6; }
+    .cat-tech      .skill-chip-dot { background: #38bdf8; }
+
+    .cat-frontend  .skill-chip { border-color: rgba(129,140,248,0.20); }
+    .cat-backend   .skill-chip { border-color: rgba(52,211,153,0.20); }
+    .cat-database  .skill-chip { border-color: rgba(251,146,60,0.20); }
+    .cat-tools     .skill-chip { border-color: rgba(244,114,182,0.20); }
+    .cat-tech      .skill-chip { border-color: rgba(56,189,248,0.20); }
+
+    /* ══ SKILLS MODAL OVERRIDE — dark pill header ══ */
+    #modal-skills-header {
+      display: none;
+      align-items: center; gap: 10px; margin-bottom: 18px;
+    }
+    #modal-skills-header.show { display: flex; }
+    .skills-modal-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 99px;
+      background: rgba(120,80,255,0.15);
+      border: 1px solid rgba(120,80,255,0.35);
+      font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+      color: #a78bfa; text-transform: uppercase;
+    }
+
+    /* ══ REST OF ORIGINAL STYLES ══ */
     #grain {
       position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -47,86 +174,58 @@
       position: fixed; inset: 0; z-index: 2; pointer-events: none;
       background: repeating-linear-gradient(to bottom, transparent 0, transparent 3px, rgba(255,255,255,0.009) 3px, rgba(255,255,255,0.009) 4px);
     }
-
-    /* ══ ENTRY VEIL — black layer that lifts on load ══ */
     #entry-veil {
       position: fixed; inset: 0; z-index: 200;
-      background: #000;
-      opacity: 1;
-      transition: opacity 0.7s ease;
-      pointer-events: none;
+      background: #000; opacity: 1;
+      transition: opacity 0.7s ease; pointer-events: none;
     }
     #entry-veil.lifted { opacity: 0; }
-
-    /* ══ HORIZONTAL WIPE LINES (PS5 style) ══ */
     #wipe-wrap {
       position: fixed; inset: 0; z-index: 190;
-      pointer-events: none;
-      overflow: hidden;
+      pointer-events: none; overflow: hidden;
     }
     .wipe-line {
       position: absolute; left: -100%; width: 100%; height: 1px;
       background: rgba(255,255,255,0.18);
-      /* JS will animate these */
     }
-
-    /* ══ TOP BAR ══ */
     #topbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 30;
       display: flex; justify-content: space-between; align-items: center;
       padding: 18px 40px 14px;
       background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
-      /* entry animation */
-      opacity: 0;
-      transform: translateY(-16px);
+      opacity: 0; transform: translateY(-16px);
       transition: opacity 0.6s ease, transform 0.6s ease;
     }
     #topbar.show { opacity: 1; transform: translateY(0); }
-
-    /* ══ SHELF ══ */
     #shelf-wrapper {
-      position: fixed;
-      top: 64px; left: 0; right: 0;
-      z-index: 20;
+      position: fixed; top: 64px; left: 0; right: 0; z-index: 20;
       padding: 12px 40px 28px;
-      /* entry animation */
-      opacity: 0;
-      transform: translateY(-22px);
+      opacity: 0; transform: translateY(-22px);
       transition: opacity 0.65s ease, transform 0.65s ease;
     }
     #shelf-wrapper.show { opacity: 1; transform: translateY(0); }
-
     #nav-dots { display: flex; gap: 6px; margin-bottom: 14px; }
     .dot {
       width: 6px; height: 6px; border-radius: 50%;
       background: rgba(255,255,255,0.22); transition: all 0.3s;
     }
     .dot.active { background: #fff; width: 18px; border-radius: 3px; }
-
     #shelf {
       display: flex; gap: 16px;
       transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-
-    /* ══ CARDS ══ */
     .game-card {
       flex-shrink: 0; width: 120px; height: 150px;
       border-radius: 12px; overflow: hidden; cursor: pointer;
       border: 2px solid transparent; position: relative;
       background: rgba(255,255,255,0.06);
-      /* individual card stagger set via inline style */
-      opacity: 0;
-      transform: translateY(-18px) scale(0.92);
+      opacity: 0; transform: translateY(-18px) scale(0.92);
       transition:
         opacity 0.5s ease,
         transform 0.5s cubic-bezier(0.34, 1.3, 0.64, 1),
-        border-color 0.3s,
-        box-shadow 0.3s;
+        border-color 0.3s, box-shadow 0.3s;
     }
-    .game-card.revealed {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+    .game-card.revealed { opacity: 1; transform: translateY(0) scale(1); }
     .game-card.active {
       transform: scale(1.16) translateY(10px) !important;
       border-color: rgba(255,255,255,0.75);
@@ -144,25 +243,16 @@
       font-size: 10px; font-weight: 500; letter-spacing: 0.04em;
       color: rgba(255,255,255,0.9); text-align: center;
     }
-
-    /* ══ DETAIL — BOTTOM ══ */
     #detail {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
       padding: 60px 40px 38px;
       background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.45) 60%, transparent 100%);
-      /* entry + switch animation */
-      opacity: 0;
-      transform: translateY(20px);
+      opacity: 0; transform: translateY(20px);
       transition: opacity 0.5s ease, transform 0.5s ease;
     }
     #detail.show  { opacity: 1; transform: translateY(0); }
     #detail.hide  { opacity: 0; transform: translateY(10px); }
-
-    #detail-inner {
-      display: flex; justify-content: space-between; align-items: flex-end; gap: 32px;
-    }
-
-    /* ══ UI ATOMS ══ */
+    #detail-inner { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
     .btn-hint {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 11px; color: rgba(255,255,255,0.42);
@@ -186,8 +276,6 @@
       font-family: 'DM Mono', monospace; color: rgba(255,255,255,0.35);
       letter-spacing: 0.06em;
     }
-
-    /* ══ MODAL ══ */
     #modal {
       position: fixed; inset: 0; z-index: 50;
       display: flex; align-items: center; justify-content: center;
@@ -196,57 +284,53 @@
       pointer-events: none;
     }
     #modal.open {
-      background: rgba(0,0,0,0.76);
-      backdrop-filter: blur(22px);
+      background: rgba(0,0,0,0.76); backdrop-filter: blur(22px);
       pointer-events: all;
     }
     #modal-card {
       background: rgba(14,14,20,0.97);
       border: 1px solid rgba(255,255,255,0.09);
       border-radius: 20px; padding: 40px;
-      max-width: 600px; width: 90%;
+      max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto;
       transform: scale(0.91) translateY(26px); opacity: 0;
       transition: transform 0.42s cubic-bezier(0.34,1.4,0.64,1), opacity 0.36s;
     }
     #modal.open #modal-card { transform: scale(1) translateY(0); opacity: 1; }
-
-    /* ══ FLASH ══ */
     #flash {
       position: fixed; inset: 0; z-index: 99;
       background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.12s;
     }
     #flash.pop { opacity: 0.08; }
-
-    /* ══ EXIT VEIL ══ */
     #exit-veil {
       position: fixed; inset: 0; z-index: 198;
       background: #000; opacity: 0; pointer-events: none;
       transition: opacity 0.55s ease;
     }
     #exit-veil.active { opacity: 1; }
-
-    /* back button */
     .back-btn {
       background: none; border: none; cursor: pointer; padding: 0;
       display: flex; align-items: center; gap: 8px;
       color: rgba(255,255,255,0.28);
       font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.12em;
-      text-transform: uppercase;
-      transition: color 0.2s;
+      text-transform: uppercase; transition: color 0.2s;
     }
     .back-btn:hover { color: rgba(255,255,255,0.65); }
     .back-arrow { font-size: 15px; line-height: 1; }
+
+    /* Special active glow for skills card */
+    .game-card.skills-special.active {
+      border-color: rgba(167,139,250,0.85);
+      box-shadow: 0 0 30px rgba(120,80,255,0.35), 0 20px 48px rgba(0,0,0,0.55);
+    }
   </style>
 </head>
 <body class="select-none">
 
-  <!-- Veils -->
   <div id="entry-veil"></div>
-  <div id="wipe-wrap" id="wipe-wrap"></div>
+  <div id="wipe-wrap"></div>
   <div id="exit-veil"></div>
   <div id="flash"></div>
 
-  <!-- BG -->
   <div id="bg-wrap">
     <div id="bg-a"></div>
     <div id="bg-b"></div>
@@ -263,16 +347,10 @@
       </button>
       <div class="w-px h-4 bg-white/10"></div>
       <div>
-        <!-- <div class="text-[10px] font-mono text-white/28 tracking-[0.2em] uppercase">Portfolio</div> -->
-         <a href="projects.html"> <divclass="text-base font-semibold tracking-tight leading-tight">Projects</divclass=></a>
-       
-      
+        <a href="projects.html"><div class="text-base font-semibold tracking-tight leading-tight">Projects</div></a>
       </div>
       <div>
-        <!-- <div class="text-[10px] font-mono text-white/28 tracking-[0.2em] uppercase">Portfolio</div> -->
-         <a href="certificates.html"> <divclass="text-base font-semibold tracking-tight leading-tight">
-        <div class="text-base font-semibold tracking-tight leading-tight">Certificates</div>
-        </a>
+        <a href="certificates.html"><div class="text-base font-semibold tracking-tight leading-tight">Certificates</div></a>
       </div>
     </div>
     <div class="flex items-center gap-5 text-white/28 text-[11px] font-mono tracking-wider">
@@ -316,14 +394,27 @@
   <!-- Modal -->
   <div id="modal">
     <div id="modal-card">
-      <div class="flex items-center gap-3 mb-5">
+      <!-- Skills header (shown only for skills card) -->
+      <div id="modal-skills-header">
+        <div class="skills-modal-badge">⬡ Tech Stack</div>
+      </div>
+
+      <!-- Standard header (hidden for skills card) -->
+      <div id="modal-standard-header" class="flex items-center gap-3 mb-5">
         <span class="text-[10px] font-mono text-white/35 tracking-[0.18em] uppercase" id="m-category"></span>
         <span class="year-badge" id="m-year"></span>
       </div>
+
       <h2 class="text-3xl font-bold mb-4 tracking-tight" id="m-title"></h2>
       <p class="text-white/60 text-sm leading-relaxed mb-5" id="m-desc"></p>
+
+      <!-- Skills categories (shown for skills card) -->
+      <div id="m-skills-grid" style="display:none; margin-bottom: 24px;"></div>
+
+      <!-- Tags (shown for project cards) -->
       <div class="flex flex-wrap gap-2 mb-7" id="m-tags"></div>
-      <div class="flex gap-3 flex-wrap items-center">
+
+      <div class="flex gap-3 flex-wrap items-center" id="m-actions">
         <a id="m-link" href="#" class="px-5 py-2.5 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition">View Live ↗</a>
         <a id="m-github" href="#" class="px-5 py-2.5 rounded-full border border-white/20 text-white/75 text-sm font-medium hover:border-white/50 transition">GitHub</a>
         <button onclick="closeModal()" class="ml-auto px-5 py-2.5 rounded-full border border-white/10 text-white/35 text-sm hover:border-white/25 transition">✕ Close</button>
@@ -331,318 +422,488 @@
     </div>
   </div>
 
+  <script>
+  // ══════════════════════════════════════════════════════════════════════
+  // SKILLS CARD CONFIG
+  // Set SKILLS_BG_TYPE to:
+  //   'gradient'  — animated gradient (default, no extra files needed)
+  //   'gif'       — use SKILLS_BG_URL as a GIF
+  //   'video'     — use SKILLS_BG_URL as an mp4/webm
+  // ══════════════════════════════════════════════════════════════════════
+  const SKILLS_BG_TYPE = 'video'; // change to 'gif' or 'video'
+  const SKILLS_BG_URL  = 'src/images/projects/cpu1.mp4'; // path to your gif/video
 
-  <!-- <script src="/src/javascript/projects.js"></script> -->
-   <script>
-    // ══ DATA ═══════════════════════════════════════════════════════════════
-const projects = [
-  {
-    title: "TalipaApp Website",
-    category: "Web App",
+  // ══ SKILLS DATA ═══════════════════════════════════════════════════════
+  const skillsData = {
+    frontend: {
+      label: 'Frontend',
+      icon: '◈',
+      items: ['HTML', 'CSS', 'JavaScript', 'Tailwind CSS', 'Bootstrap', 'Blade (Laravel)']
+    },
+    backend: {
+      label: 'Backend',
+      icon: '◉',
+      items: ['PHP', 'Laravel', 'Flask (Python)', 'REST API', 'Node.js']
+    },
+    database: {
+      label: 'Database',
+      icon: '▣',
+      items: ['MySQL', 'SQLite']
+    },
+    tools: {
+      label: 'Tools & Platforms',
+      icon: '◆',
+      items: ['Git', 'GitHub', 'Android Studio', 'VS Code', 'Postman', 'Figma']
+    },
+    tech: {
+      label: 'Languages & Technologies',
+      icon: '◎',
+      items: ['Java', 'C++', 'Python', 'OpenGL (GLUT)', 'Android SDK']
+    }
+  };
+
+  // ══ DATA ═════════════════════════════════════════════════════════════
+  // The skills entry — index 0, special type
+  const skillsEntry = {
+    _isSkills: true,
+    title: "Technical Skills",
+    category: "Stack",
     year: "2026",
-    desc: "A real-time analytics dashboard for SaaS metrics with customizable widgets and dark-mode-first design.",
-    tags: ["React", "TypeScript", "Recharts", "Tailwind"],
-    image: "src/images/projects/talipaApp_web_dep.png",
-    thumb: "src/images/projects/tali_web.png",
-    link: "#",
-    github: "#",
-  },
-  {
-    title: "Orbital Store",
-    category: "E-Commerce",
-    year: "2024",
-    desc: "Full-stack e-commerce platform with animated product reveals, cart persistence, and Stripe checkout.",
-    tags: ["Next.js", "Stripe", "Prisma", "PostgreSQL"],
-    image:
-      "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300&q=80",
-    link: "#",
-    github: "#",
-  },
-  {
-    title: "Pulse Health",
-    category: "Mobile App",
-    year: "2023",
-    desc: "Cross-platform health tracker featuring biometric syncing, AI insights, and motion-based UI.",
-    tags: ["React Native", "Expo", "HealthKit", "AI"],
-    image:
-      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=300&q=80",
-    link: "#",
-    github: "#",
-  },
-  {
-    title: "Luma 3D",
-    category: "Creative",
-    year: "2023",
-    desc: "Interactive 3D product configurator built with Three.js — rotate, texture, and export in real time.",
-    tags: ["Three.js", "WebGL", "GSAP", "Blender"],
-    image:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=80",
-    link: "#",
-    github: "#",
-  },
-  {
-    title: "Cipher Chat",
-    category: "Fullstack",
-    year: "2023",
-    desc: "End-to-end encrypted messaging app with disappearing messages, group rooms, and WebSocket sync.",
-    tags: ["Node.js", "Socket.io", "MongoDB", "Crypto"],
-    image:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&q=80",
-    link: "#",
-    github: "#",
-  },
-  {
-    title: "Terrain Gen",
-    category: "Experiment",
-    year: "2022",
-    desc: "Procedural terrain generator using Perlin noise — export heightmaps and fly-through in browser.",
-    tags: ["Canvas API", "WebGL", "Algorithms", "Vanilla JS"],
-    image:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300&q=80",
-    link: "#",
-    github: "#",
-  },
-];
+    desc: "A full overview of my technical toolkit — from frontend interfaces to backend systems, mobile development, and the tools I use daily.",
+    tags: ["Frontend", "Backend", "Database", "Tools", "Mobile"],
+    image: null, // skills card uses animated bg for the main BG too
+    thumb: null,
+    link: null,
+    github: null,
+  };
 
-// ══ STATE ══════════════════════════════════════════════════════════════
-let active = 0,
-  bgFlip = false;
-let mouseX = 0,
-  mouseY = 0,
-  targetX = 0,
-  targetY = 0;
+  const projects = [
+    skillsEntry,
+    {
+      title: "TalipaApp Website",
+      category: "Website",
+      year: "2026",
+      desc: "TalipaApp is a digital guide for public market buyers, while also providing a platform for vendors to market their products. Discover products more efficiently and compare quality and prices!",
+      tags: ["Laravel", "MySql", "Tailwind"],
+      image: "src/images/projects/tali_web1.png",
+      thumb: "src/images/projects/tali_web.png",
+      link: "https://talipaapp.shop/",
+      github: "https://github.com/RiverLungay/TalipaApp_Website.git",
+    },
+    {
+      title: "TalipaApp Android",
+      category: "Mobile App",
+      year: "2026",
+      desc: "TalipaApp is a digital guide for public market buyers, while also providing a platform for vendors to market their products. Discover products more efficiently and compare quality and prices!",
+      tags: ["Android Studio", "Laravel API", "MySql"],
+      image: "src/images/projects/tali_app.png",
+      thumb: "src/images/projects/tali_web.png",
+      link: "#",
+      github: "https://github.com/RiverLungay/TalipaApp_Android.git",
+    },
+    {
+      title: "Space Shooter",
+      category: "Computer Game",
+      year: "2024",
+      desc: "A 2D action survival game built using C++ and OpenGL (GLUT) where the player must survive against hostile enemies while protecting a key objective within a limited time.",
+      tags: ["C++", "Glut"],
+      image: "src/images/projects/spaceShooter.png",
+      thumb: "src/images/projects/spaceShooter_logo.png",
+      link: "#",
+      github: "https://github.com/RiverLungay/SpaceShooter",
+    },
+    {
+      title: "Flask Practice",
+      category: "Website",
+      year: "2025",
+      desc: "Interactive Website about the latest IPhone, and showcasing it using Flask.",
+      tags: ["Flask", "Tailwind CSS"],
+      image: "src/images/projects/flask_iphone.png",
+      thumb: "src/images/projects/flask_iphone_logo.png",
+      link: "https://flask-iphone.onrender.com/",
+      github: "https://github.com/RiverLungay/Flask_Iphone",
+    },
+    {
+      title: "Browser Ninja",
+      category: "Mobile Game",
+      year: "2023",
+      desc: "A Simple mini game about slashing browsers and avoiding viruses.",
+      tags: ["Android Studio, Java, Sqlite"],
+      image: "src/images/projects/browserNinja.png",
+      thumb: "src/images/projects/browserNinja_logo.png",
+      link: "#",
+      github: "https://github.com/RiverLungay/browser_ninja",
+    },
+    {
+      title: "Creating Resume using CSS and HTML",
+      category: "HTML and CSS Practice",
+      year: "2023",
+      desc: "Utilizing technology such as CSS and HTML to create a resume.",
+      tags: ["HTML", "CSS"],
+      image: "src/images/projects/resume_css.png",
+      thumb: "src/images/projects/resume_css_logo.png",
+      link: "https://riverlungay.github.io/resume_css/",
+      github: "https://github.com/RiverLungay/resume_css",
+    },
+    {
+      title: "Tailwind CSS Utilization Website",
+      category: "Tailwind CSS Practice",
+      year: "2025",
+      desc: "Utilizing technology such as Tailwind CSS to create a website and showcasing its features.",
+      tags: ["Tailwind CSS"],
+      image: "src/images/projects/tailwind_css.png",
+      thumb: "src/images/projects/tailwind_css_logo.png",
+      link: "https://riverlungay.github.io/tailwind_pract/",
+      github: "https://github.com/RiverLungay/tailwind_pract.git",
+    },
+    {
+      title: "JavaScript Library Web System",
+      category: "JavaScript Practice",
+      year: "2025",
+      desc: "Utilizing technology such as Javascript to create a mini library website and showcasing its features.",
+      tags: ["JavaScript"],
+      image: "src/images/projects/library_javascript.png",
+      thumb: "src/images/projects/library_javascript_logo.png",
+      link: "https://riverlungay.github.io/JavaScript_Library/",
+      github: "https://github.com/RiverLungay/JavaScript_Library",
+    },
+  ];
 
-const bgWrap = document.getElementById("bg-wrap");
-const bgA = document.getElementById("bg-a");
-const bgB = document.getElementById("bg-b");
-const shelf = document.getElementById("shelf");
-const detail = document.getElementById("detail");
-const navDots = document.getElementById("nav-dots");
-const modal = document.getElementById("modal");
-const flash = document.getElementById("flash");
-const wipeWrap = document.getElementById("wipe-wrap");
+  // ══ STATE ════════════════════════════════════════════════════════════
+  let active = 0, bgFlip = false;
+  let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 
-// ══ BUILD SHELF ════════════════════════════════════════════════════════
-projects.forEach((p, i) => {
-  const dot = document.createElement("div");
-  dot.className = "dot" + (i === 0 ? " active" : "");
-  dot.id = "dot-" + i;
-  navDots.appendChild(dot);
+  const bgWrap   = document.getElementById("bg-wrap");
+  const bgA      = document.getElementById("bg-a");
+  const bgB      = document.getElementById("bg-b");
+  const shelf    = document.getElementById("shelf");
+  const detail   = document.getElementById("detail");
+  const navDots  = document.getElementById("nav-dots");
+  const modal    = document.getElementById("modal");
+  const flash    = document.getElementById("flash");
+  const wipeWrap = document.getElementById("wipe-wrap");
 
-  const card = document.createElement("div");
-  card.className = "game-card";
-  card.id = "card-" + i;
-  // stagger delay for entry reveal
-  card.style.transitionDelay = `${i * 55}ms`;
-  card.innerHTML = `<img src="${p.thumb}" alt="${p.title}" loading="lazy"/><div class="card-label">${p.title}</div>`;
-  card.addEventListener("click", () => {
-    if (active === i) openModal(i);
-    else setActive(i);
-  });
-  shelf.appendChild(card);
-});
+  // ══ BUILD SKILLS CARD DOM ════════════════════════════════════════════
+  function buildSkillsCardInner(card) {
+    card.classList.add('skills-special');
 
-document
-  .getElementById("btn-open")
-  .addEventListener("click", () => openModal(active));
+    // Animated background
+    const bg = document.createElement('div');
+    bg.className = 'skills-card-bg';
 
-// ══ PS5-STYLE ENTRY SEQUENCE ═══════════════════════════════════════════
-function runEntryAnimation() {
-  // 1. First, load the initial BG behind the veil
-  bgA.style.backgroundImage = `url('${projects[0].image}')`;
-  bgA.style.opacity = "1";
+    if (SKILLS_BG_TYPE === 'gif') {
+      bg.classList.add('gif-mode');
+      const img = document.createElement('img');
+      img.src = SKILLS_BG_URL; img.alt = '';
+      bg.appendChild(img);
+    } else if (SKILLS_BG_TYPE === 'video') {
+      bg.classList.add('gif-mode');
+      const vid = document.createElement('video');
+      vid.src = SKILLS_BG_URL; vid.autoplay = true;
+      vid.loop = true; vid.muted = true; vid.playsInline = true;
+      vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+      bg.appendChild(vid);
+    }
 
-  // 2. After a tiny breath, shoot horizontal wipe lines across screen
-  setTimeout(() => {
-    spawnWipeLines();
-  }, 80);
+    card.appendChild(bg);
 
-  // 3. Lift the black veil
-  setTimeout(() => {
-    document.getElementById("entry-veil").classList.add("lifted");
-  }, 220);
+    // Grid overlay
+    const grid = document.createElement('div');
+    grid.className = 'skills-grid-overlay';
+    card.appendChild(grid);
 
-  // 4. Slide in topbar
-  setTimeout(() => {
-    document.getElementById("topbar").classList.add("show");
-  }, 480);
+    // Floating dots
+    const dotConfigs = [
+      { size: 32, top: '12%', left: '8%',  delay: '0s',    dur: '4s'   },
+      { size: 20, top: '60%', left: '70%', delay: '1.2s',  dur: '5.5s' },
+      { size: 14, top: '30%', left: '55%', delay: '0.6s',  dur: '3.8s' },
+      { size: 24, top: '75%', left: '18%', delay: '2s',    dur: '6s'   },
+    ];
+    dotConfigs.forEach(d => {
+      const dot = document.createElement('div');
+      dot.className = 'skills-dot';
+      dot.style.cssText = `width:${d.size}px;height:${d.size}px;top:${d.top};left:${d.left};animation-delay:${d.delay};animation-duration:${d.dur};`;
+      card.appendChild(dot);
+    });
 
-  // 5. Slide in shelf wrapper
-  setTimeout(() => {
-    document.getElementById("shelf-wrapper").classList.add("show");
-  }, 580);
+    // Icon
+    const icon = document.createElement('div');
+    icon.className = 'skills-card-icon';
+    icon.textContent = '⬡';
+    card.appendChild(icon);
 
-  // 6. Pop each card in with stagger
-  setTimeout(() => {
-    document
-      .querySelectorAll(".game-card")
-      .forEach((c) => c.classList.add("revealed"));
-  }, 680);
-
-  // 7. Slide up detail panel
-  setTimeout(() => {
-    setActive(0); // sets data + triggers detail show
-  }, 900);
-}
-
-// Horizontal wipe lines — PS5 swoosh effect
-function spawnWipeLines() {
-  const lineCount = 6;
-  const positions = [0.12, 0.28, 0.44, 0.58, 0.72, 0.88];
-  positions.forEach((pos, i) => {
-    const line = document.createElement("div");
-    line.className = "wipe-line";
-    line.style.top = pos * 100 + "vh";
-    wipeWrap.appendChild(line);
-
-    // Animate: shoot right then fade
-    setTimeout(() => {
-      line.style.transition =
-        "left 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease 0.45s";
-      line.style.left = "100%";
-      line.style.opacity = "0";
-      setTimeout(() => line.remove(), 900);
-    }, i * 28);
-  });
-}
-
-// ══ SET ACTIVE ═════════════════════════════════════════════════════════
-function setActive(idx) {
-  const prev = active;
-  active = idx;
-
-  if (idx !== prev) {
-    flash.classList.add("pop");
-    setTimeout(() => flash.classList.remove("pop"), 140);
+    // Label
+    const label = document.createElement('div');
+    label.className = 'skills-card-label';
+    label.textContent = 'SKILLS';
+    card.appendChild(label);
   }
 
-  document.getElementById("card-" + prev)?.classList.remove("active");
-  document.getElementById("card-" + idx)?.classList.add("active");
-  document.getElementById("dot-" + prev)?.classList.remove("active");
-  document.getElementById("dot-" + idx)?.classList.add("active");
+  // ══ BUILD SHELF ══════════════════════════════════════════════════════
+  projects.forEach((p, i) => {
+    const dot = document.createElement("div");
+    dot.className = "dot" + (i === 0 ? " active" : "");
+    dot.id = "dot-" + i;
+    navDots.appendChild(dot);
 
-  const cardW = 136;
-  const visible = Math.floor((window.innerWidth - 80) / cardW);
-  const offset = Math.max(0, idx - Math.floor(visible / 2)) * cardW;
-  shelf.style.transform = `translateX(-${offset}px)`;
+    const card = document.createElement("div");
+    card.className = "game-card";
+    card.id = "card-" + i;
+    card.style.transitionDelay = `${i * 55}ms`;
 
-  crossfadeBg(idx);
-  updateDetail(idx);
-}
+    if (p._isSkills) {
+      buildSkillsCardInner(card);
+    } else {
+      card.innerHTML = `<img src="${p.thumb}" alt="${p.title}" loading="lazy"/><div class="card-label">${p.title}</div>`;
+    }
 
-// ══ CROSSFADE BG ═══════════════════════════════════════════════════════
-function crossfadeBg(idx) {
-  const url = `url('${projects[idx].image}')`;
-  if (!bgFlip) {
-    bgB.style.backgroundImage = url;
-    requestAnimationFrame(() => {
-      bgB.style.opacity = "1";
-      bgA.style.opacity = "0";
+    card.addEventListener("click", () => {
+      if (active === i) openModal(i);
+      else setActive(i);
     });
-  } else {
-    bgA.style.backgroundImage = url;
-    requestAnimationFrame(() => {
+    shelf.appendChild(card);
+  });
+
+  document.getElementById("btn-open").addEventListener("click", () => openModal(active));
+
+  // ══ SKILLS BG ════════════════════════════════════════════════════════
+  let bgVideo = null; // keep reference to injected video element
+
+  function applySkillsBg() {
+    const panel = !bgFlip ? bgB : bgA;
+    const hide  = !bgFlip ? bgA : bgB;
+
+    if (SKILLS_BG_TYPE === 'video') {
+      // Clear any background-image on the panel
+      panel.style.backgroundImage = 'none';
+
+      // Remove old video if present
+      if (bgVideo) bgVideo.remove();
+
+      bgVideo = document.createElement('video');
+      bgVideo.src = SKILLS_BG_URL;
+      bgVideo.autoplay = true;
+      bgVideo.loop = true;
+      bgVideo.muted = true;
+      bgVideo.playsInline = true;
+      bgVideo.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+      panel.appendChild(bgVideo);
+
+      requestAnimationFrame(() => { panel.style.opacity = "1"; hide.style.opacity = "0"; });
+    } else if (SKILLS_BG_TYPE === 'gif') {
+      // Remove stale video if any
+      if (bgVideo) { bgVideo.remove(); bgVideo = null; }
+      panel.style.backgroundImage = `url('${SKILLS_BG_URL}')`;
+      requestAnimationFrame(() => { panel.style.opacity = "1"; hide.style.opacity = "0"; });
+    } else {
+      // gradient fallback
+      if (bgVideo) { bgVideo.remove(); bgVideo = null; }
+      const grad = 'linear-gradient(135deg, #0f0c29 0%, #302b63 40%, #24243e 70%, #0f3460 100%)';
+      panel.style.backgroundImage = grad;
+      requestAnimationFrame(() => { panel.style.opacity = "1"; hide.style.opacity = "0"; });
+    }
+
+    bgFlip = !bgFlip;
+  }
+
+  // ══ ENTRY SEQUENCE ═══════════════════════════════════════════════════
+  function runEntryAnimation() {
+    if (projects[0]._isSkills) {
+      applySkillsBg();
+    } else {
+      bgA.style.backgroundImage = `url('${projects[0].image}')`;
       bgA.style.opacity = "1";
-      bgB.style.opacity = "0";
+    }
+    setTimeout(() => spawnWipeLines(), 80);
+    setTimeout(() => document.getElementById("entry-veil").classList.add("lifted"), 220);
+    setTimeout(() => document.getElementById("topbar").classList.add("show"), 480);
+    setTimeout(() => document.getElementById("shelf-wrapper").classList.add("show"), 580);
+    setTimeout(() => document.querySelectorAll(".game-card").forEach(c => c.classList.add("revealed")), 680);
+    setTimeout(() => setActive(0), 900);
+  }
+
+  function spawnWipeLines() {
+    const positions = [0.12, 0.28, 0.44, 0.58, 0.72, 0.88];
+    positions.forEach((pos, i) => {
+      const line = document.createElement("div");
+      line.className = "wipe-line";
+      line.style.top = pos * 100 + "vh";
+      wipeWrap.appendChild(line);
+      setTimeout(() => {
+        line.style.transition = "left 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease 0.45s";
+        line.style.left = "100%"; line.style.opacity = "0";
+        setTimeout(() => line.remove(), 900);
+      }, i * 28);
     });
   }
-  bgFlip = !bgFlip;
-}
 
-// ══ DETAIL ═════════════════════════════════════════════════════════════
-function updateDetail(idx) {
-  const p = projects[idx];
-  // quick fade out
-  detail.classList.remove("show");
-  detail.classList.add("hide");
-  setTimeout(() => {
-    document.getElementById("d-category").textContent = p.category;
-    document.getElementById("d-year").textContent = p.year;
-    document.getElementById("d-title").textContent = p.title;
-    document.getElementById("d-desc").textContent = p.desc;
-    document.getElementById("d-tags").innerHTML = p.tags
-      .map((t) => `<span class="tag">${t}</span>`)
-      .join("");
-    detail.classList.remove("hide");
-    detail.classList.add("show");
-  }, 180);
-}
+  // ══ SET ACTIVE ═══════════════════════════════════════════════════════
+  function setActive(idx) {
+    const prev = active;
+    active = idx;
+    if (idx !== prev) {
+      flash.classList.add("pop");
+      setTimeout(() => flash.classList.remove("pop"), 140);
+    }
+    document.getElementById("card-" + prev)?.classList.remove("active");
+    document.getElementById("card-" + idx)?.classList.add("active");
+    document.getElementById("dot-" + prev)?.classList.remove("active");
+    document.getElementById("dot-" + idx)?.classList.add("active");
 
-// ══ MODAL ══════════════════════════════════════════════════════════════
-function openModal(idx) {
-  const p = projects[idx];
-  document.getElementById("m-category").textContent = p.category;
-  document.getElementById("m-year").textContent = p.year;
-  document.getElementById("m-title").textContent = p.title;
-  document.getElementById("m-desc").textContent = p.desc;
-  document.getElementById("m-tags").innerHTML = p.tags
-    .map((t) => `<span class="tag">${t}</span>`)
-    .join("");
-  document.getElementById("m-link").href = p.link;
-  document.getElementById("m-github").href = p.github;
-  modal.classList.add("open");
-}
-window.closeModal = () => modal.classList.remove("open");
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) closeModal();
-});
+    const cardW = 136;
+    const visible = Math.floor((window.innerWidth - 80) / cardW);
+    const offset = Math.max(0, idx - Math.floor(visible / 2)) * cardW;
+    shelf.style.transform = `translateX(-${offset}px)`;
 
-// ══ PARALLAX ═══════════════════════════════════════════════════════════
-document.addEventListener("mousemove", (e) => {
-  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-});
-(function loop() {
-  targetX += (mouseX - targetX) * 0.055;
-  targetY += (mouseY - targetY) * 0.055;
-  bgWrap.style.transform = `scale(1.09) translate(${targetX * 14}px, ${targetY * 10}px)`;
-  requestAnimationFrame(loop);
-})();
-
-// ══ KEYBOARD ═══════════════════════════════════════════════════════════
-document.addEventListener("keydown", (e) => {
-  if (modal.classList.contains("open")) {
-    if (e.key === "Escape") closeModal();
-    return;
+    crossfadeBg(idx);
+    updateDetail(idx);
   }
-  if (e.key === "ArrowRight")
-    setActive(Math.min(active + 1, projects.length - 1));
-  if (e.key === "ArrowLeft") setActive(Math.max(active - 1, 0));
-  if (e.key === "Enter" || e.key === " ") openModal(active);
-});
 
-// ══ BACK NAV ═══════════════════════════════════════════════════════════
-window.goBack = function () {
-  const veil = document.getElementById("exit-veil");
-  veil.classList.add("active");
-  setTimeout(() => {
-    window.location.href = "index.html";
-  }, 580);
-};
+  // ══ CROSSFADE BG ════════════════════════════════════════════════════
+  function crossfadeBg(idx) {
+    if (projects[idx]._isSkills) {
+      applySkillsBg();
+      return;
+    }
+    // Switching away from skills — remove any injected video
+    if (bgVideo) { bgVideo.remove(); bgVideo = null; }
 
-// ══ CLOCK ══════════════════════════════════════════════════════════════
-const clockEl = document.getElementById("clock");
-(function tickClock() {
-  clockEl.textContent = new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
+    const url = `url('${projects[idx].image}')`;
+    if (!bgFlip) {
+      bgB.style.backgroundImage = url;
+      requestAnimationFrame(() => { bgB.style.opacity = "1"; bgA.style.opacity = "0"; });
+    } else {
+      bgA.style.backgroundImage = url;
+      requestAnimationFrame(() => { bgA.style.opacity = "1"; bgB.style.opacity = "0"; });
+    }
+    bgFlip = !bgFlip;
+  }
+
+  // ══ DETAIL ══════════════════════════════════════════════════════════
+  function updateDetail(idx) {
+    const p = projects[idx];
+    detail.classList.remove("show");
+    detail.classList.add("hide");
+    setTimeout(() => {
+      document.getElementById("d-category").textContent = p.category;
+      document.getElementById("d-year").textContent = p.year;
+      document.getElementById("d-title").textContent = p.title;
+      document.getElementById("d-desc").textContent = p.desc;
+      document.getElementById("d-tags").innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join("");
+      detail.classList.remove("hide");
+      detail.classList.add("show");
+    }, 180);
+  }
+
+  // ══ MODAL ══════════════════════════════════════════════════════════
+  function buildSkillsGrid() {
+    const grid = document.getElementById("m-skills-grid");
+    grid.innerHTML = '';
+    Object.entries(skillsData).forEach(([key, cat]) => {
+      const section = document.createElement('div');
+      section.className = `skill-category cat-${key}`;
+      section.innerHTML = `
+        <div class="skill-category-title">${cat.icon} ${cat.label}</div>
+        <div class="skill-chips">
+          ${cat.items.map(item => `
+            <div class="skill-chip">
+              <span class="skill-chip-dot"></span>
+              ${item}
+            </div>
+          `).join('')}
+        </div>
+      `;
+      grid.appendChild(section);
+    });
+  }
+
+  function openModal(idx) {
+    const p = projects[idx];
+    const isSkills = p._isSkills;
+
+    // Toggle headers
+    document.getElementById("modal-skills-header").classList.toggle("show", isSkills);
+    document.getElementById("modal-standard-header").style.display = isSkills ? "none" : "";
+
+    document.getElementById("m-category").textContent = p.category;
+    document.getElementById("m-year").textContent = p.year;
+    document.getElementById("m-title").textContent = p.title;
+    document.getElementById("m-desc").textContent = p.desc;
+
+    // Skills grid vs tags
+    const skillsGrid = document.getElementById("m-skills-grid");
+    const tagsEl = document.getElementById("m-tags");
+
+    if (isSkills) {
+      skillsGrid.style.display = "block";
+      buildSkillsGrid();
+      tagsEl.innerHTML = '';
+      tagsEl.style.display = "none";
+    } else {
+      skillsGrid.style.display = "none";
+      tagsEl.style.display = "";
+      tagsEl.innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join("");
+    }
+
+    // Action buttons
+    const actions = document.getElementById("m-actions");
+    const linkEl = document.getElementById("m-link");
+    const ghEl   = document.getElementById("m-github");
+    if (isSkills) {
+      linkEl.style.display = "none";
+      ghEl.style.display = "none";
+    } else {
+      linkEl.style.display = "";
+      ghEl.style.display = "";
+      linkEl.href = p.link;
+      ghEl.href = p.github;
+    }
+
+    modal.classList.add("open");
+  }
+
+  window.closeModal = () => modal.classList.remove("open");
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+
+  // ══ PARALLAX ════════════════════════════════════════════════════════
+  document.addEventListener("mousemove", e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
   });
-  setTimeout(tickClock, 10000);
-})();
+  (function loop() {
+    targetX += (mouseX - targetX) * 0.055;
+    targetY += (mouseY - targetY) * 0.055;
+    bgWrap.style.transform = `scale(1.09) translate(${targetX * 14}px, ${targetY * 10}px)`;
+    requestAnimationFrame(loop);
+  })();
 
-// ══ BOOT ═══════════════════════════════════════════════════════════════
-runEntryAnimation();
+  // ══ KEYBOARD ════════════════════════════════════════════════════════
+  document.addEventListener("keydown", e => {
+    if (modal.classList.contains("open")) {
+      if (e.key === "Escape") closeModal();
+      return;
+    }
+    if (e.key === "ArrowRight") setActive(Math.min(active + 1, projects.length - 1));
+    if (e.key === "ArrowLeft")  setActive(Math.max(active - 1, 0));
+    if (e.key === "Enter" || e.key === " ") openModal(active);
+  });
 
-   </script>
+  // ══ BACK NAV ════════════════════════════════════════════════════════
+  window.goBack = function () {
+    const veil = document.getElementById("exit-veil");
+    veil.classList.add("active");
+    setTimeout(() => { window.location.href = "index.html"; }, 580);
+  };
+
+  // ══ CLOCK ═══════════════════════════════════════════════════════════
+  const clockEl = document.getElementById("clock");
+  (function tickClock() {
+    clockEl.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    setTimeout(tickClock, 10000);
+  })();
+
+  // ══ BOOT ════════════════════════════════════════════════════════════
+  runEntryAnimation();
+  </script>
 </body>
 </html>

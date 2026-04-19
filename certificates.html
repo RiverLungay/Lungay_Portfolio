@@ -3,136 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio — Projects</title>
+  <title>Portfolio — Certificates</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="output.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'DM Sans', sans-serif; background: #000; color: #fff; }
 
-    /* ══ BACKGROUND ══ */
-    #bg-wrap {
-      position: fixed; inset: 0; z-index: 0;
-      will-change: transform;
-    }
-    #bg-a, #bg-b {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      transition: opacity 0.8s ease;
-    }
+    #bg-wrap { position: fixed; inset: 0; z-index: 0; will-change: transform; }
+    #bg-a, #bg-b { position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.8s ease; }
     #bg-b { opacity: 0; }
     #bg-overlay {
       position: absolute; inset: 0; z-index: 2;
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.62) 0%,
-        rgba(0,0,0,0.14) 32%,
-        rgba(0,0,0,0.14) 58%,
-        rgba(0,0,0,0.88) 100%
-      );
+      background: linear-gradient(to bottom, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.14) 32%, rgba(0,0,0,0.14) 58%, rgba(0,0,0,0.88) 100%);
     }
 
-    #grain {
-      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 128px;
-    }
-    #scanline {
-      position: fixed; inset: 0; z-index: 2; pointer-events: none;
-      background: repeating-linear-gradient(to bottom, transparent 0, transparent 3px, rgba(255,255,255,0.009) 3px, rgba(255,255,255,0.009) 4px);
-    }
+    #grain { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 128px; }
+    #scanline { position: fixed; inset: 0; z-index: 2; pointer-events: none; background: repeating-linear-gradient(to bottom, transparent 0, transparent 3px, rgba(255,255,255,0.009) 3px, rgba(255,255,255,0.009) 4px); }
 
-    /* ══ ENTRY VEIL — black layer that lifts on load ══ */
-    #entry-veil {
-      position: fixed; inset: 0; z-index: 200;
-      background: #000;
-      opacity: 1;
-      transition: opacity 0.7s ease;
-      pointer-events: none;
-    }
+    #entry-veil { position: fixed; inset: 0; z-index: 200; background: #000; opacity: 1; transition: opacity 0.7s ease; pointer-events: none; }
     #entry-veil.lifted { opacity: 0; }
 
-    /* ══ HORIZONTAL WIPE LINES (PS5 style) ══ */
-    #wipe-wrap {
-      position: fixed; inset: 0; z-index: 190;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .wipe-line {
-      position: absolute; left: -100%; width: 100%; height: 1px;
-      background: rgba(255,255,255,0.18);
-      /* JS will animate these */
-    }
+    #wipe-wrap { position: fixed; inset: 0; z-index: 190; pointer-events: none; overflow: hidden; }
+    .wipe-line { position: absolute; left: -100%; width: 100%; height: 1px; background: rgba(255,255,255,0.18); }
 
-    /* ══ TOP BAR ══ */
     #topbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 30;
       display: flex; justify-content: space-between; align-items: center;
       padding: 18px 40px 14px;
       background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
-      /* entry animation */
-      opacity: 0;
-      transform: translateY(-16px);
+      opacity: 0; transform: translateY(-16px);
       transition: opacity 0.6s ease, transform 0.6s ease;
     }
     #topbar.show { opacity: 1; transform: translateY(0); }
 
-    /* ══ SHELF ══ */
     #shelf-wrapper {
-      position: fixed;
-      top: 64px; left: 0; right: 0;
-      z-index: 20;
+      position: fixed; top: 64px; left: 0; right: 0; z-index: 20;
       padding: 12px 40px 28px;
-      /* entry animation */
-      opacity: 0;
-      transform: translateY(-22px);
+      opacity: 0; transform: translateY(-22px);
       transition: opacity 0.65s ease, transform 0.65s ease;
     }
     #shelf-wrapper.show { opacity: 1; transform: translateY(0); }
 
     #nav-dots { display: flex; gap: 6px; margin-bottom: 14px; }
-    .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(255,255,255,0.22); transition: all 0.3s;
-    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.22); transition: all 0.3s; }
     .dot.active { background: #fff; width: 18px; border-radius: 3px; }
 
-    #shelf {
-      display: flex; gap: 16px;
-      transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
+    #shelf { display: flex; gap: 16px; transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 
-    /* ══ CARDS ══ */
-    .game-card {
+    .cert-card {
       flex-shrink: 0; width: 120px; height: 150px;
       border-radius: 12px; overflow: hidden; cursor: pointer;
       border: 2px solid transparent; position: relative;
       background: rgba(255,255,255,0.06);
-      /* individual card stagger set via inline style */
-      opacity: 0;
-      transform: translateY(-18px) scale(0.92);
-      transition:
-        opacity 0.5s ease,
-        transform 0.5s cubic-bezier(0.34, 1.3, 0.64, 1),
-        border-color 0.3s,
-        box-shadow 0.3s;
+      opacity: 0; transform: translateY(-18px) scale(0.92);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.3, 0.64, 1), border-color 0.3s, box-shadow 0.3s;
     }
-    .game-card.revealed {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    .game-card.active {
+    .cert-card.revealed { opacity: 1; transform: translateY(0) scale(1); }
+    .cert-card.active {
       transform: scale(1.16) translateY(10px) !important;
       border-color: rgba(255,255,255,0.75);
       box-shadow: 0 0 30px rgba(255,255,255,0.18), 0 20px 48px rgba(0,0,0,0.55);
     }
-    .game-card:not(.active):hover {
-      transform: scale(1.06) translateY(4px) !important;
-      border-color: rgba(255,255,255,0.22);
+    .cert-card:not(.active):hover { transform: scale(1.06) translateY(4px) !important; border-color: rgba(255,255,255,0.22); }
+    .cert-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cert-card-icon {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
     }
-    .game-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cert-card-icon svg { width: 36px; height: 36px; opacity: 0.7; }
     .card-label {
       position: absolute; bottom: 0; left: 0; right: 0;
       padding: 24px 8px 8px;
@@ -141,49 +81,22 @@
       color: rgba(255,255,255,0.9); text-align: center;
     }
 
-    /* ══ DETAIL — BOTTOM ══ */
     #detail {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
       padding: 60px 40px 38px;
       background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.45) 60%, transparent 100%);
-      /* entry + switch animation */
-      opacity: 0;
-      transform: translateY(20px);
+      opacity: 0; transform: translateY(20px);
       transition: opacity 0.5s ease, transform 0.5s ease;
     }
-    #detail.show  { opacity: 1; transform: translateY(0); }
-    #detail.hide  { opacity: 0; transform: translateY(10px); }
+    #detail.show { opacity: 1; transform: translateY(0); }
+    #detail.hide { opacity: 0; transform: translateY(10px); }
+    #detail-inner { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
 
-    #detail-inner {
-      display: flex; justify-content: space-between; align-items: flex-end; gap: 32px;
-    }
+    .btn-hint { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.42); font-family: 'DM Mono', monospace; }
+    .btn-circle { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid currentColor; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 500; background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.62); letter-spacing: 0.03em; }
+    .year-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); font-size: 11px; font-family: 'DM Mono', monospace; color: rgba(255,255,255,0.35); letter-spacing: 0.06em; }
 
-    /* ══ UI ATOMS ══ */
-    .btn-hint {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 11px; color: rgba(255,255,255,0.42);
-      font-family: 'DM Mono', monospace;
-    }
-    .btn-circle {
-      width: 20px; height: 20px; border-radius: 50%;
-      border: 1.5px solid currentColor;
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 700;
-    }
-    .tag {
-      display: inline-block; padding: 3px 10px; border-radius: 99px;
-      font-size: 11px; font-weight: 500;
-      background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.62);
-      letter-spacing: 0.03em;
-    }
-    .year-badge {
-      display: inline-block; padding: 2px 8px; border-radius: 4px;
-      background: rgba(255,255,255,0.08); font-size: 11px;
-      font-family: 'DM Mono', monospace; color: rgba(255,255,255,0.35);
-      letter-spacing: 0.06em;
-    }
-
-    /* ══ MODAL ══ */
     #modal {
       position: fixed; inset: 0; z-index: 50;
       display: flex; align-items: center; justify-content: center;
@@ -191,58 +104,44 @@
       transition: background 0.4s, backdrop-filter 0.4s;
       pointer-events: none;
     }
-    #modal.open {
-      background: rgba(0,0,0,0.76);
-      backdrop-filter: blur(22px);
-      pointer-events: all;
-    }
+    #modal.open { background: rgba(0,0,0,0.76); backdrop-filter: blur(22px); pointer-events: all; }
     #modal-card {
-      background: rgba(14,14,20,0.97);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 20px; padding: 40px;
-      max-width: 600px; width: 90%;
+      background: rgba(14,14,20,0.97); border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px; padding: 28px; max-width: 780px; width: 92%;
       transform: scale(0.91) translateY(26px); opacity: 0;
       transition: transform 0.42s cubic-bezier(0.34,1.4,0.64,1), opacity 0.36s;
     }
     #modal.open #modal-card { transform: scale(1) translateY(0); opacity: 1; }
 
-    /* ══ FLASH ══ */
-    #flash {
-      position: fixed; inset: 0; z-index: 99;
-      background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.12s;
+    /* credential badge inside modal */
+    #m-credential-wrap { margin-bottom: 20px; }
+    .credential-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 8px 14px;
     }
-    #flash.pop { opacity: 0.08; }
+    .credential-badge span { font-size: 12px; font-family: 'DM Mono', monospace; color: rgba(255,255,255,0.45); letter-spacing: 0.06em; }
+    .credential-id { font-size: 12px; font-family: 'DM Mono', monospace; color: rgba(255,255,255,0.6); }
 
-    /* ══ EXIT VEIL ══ */
-    #exit-veil {
-      position: fixed; inset: 0; z-index: 198;
-      background: #000; opacity: 0; pointer-events: none;
-      transition: opacity 0.55s ease;
-    }
+    #flash { position: fixed; inset: 0; z-index: 99; background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.12s; }
+    #flash.pop { opacity: 0.08; }
+    #exit-veil { position: fixed; inset: 0; z-index: 198; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.55s ease; }
     #exit-veil.active { opacity: 1; }
 
-    /* back button */
-    .back-btn {
-      background: none; border: none; cursor: pointer; padding: 0;
-      display: flex; align-items: center; gap: 8px;
-      color: rgba(255,255,255,0.28);
-      font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.12em;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
+    .back-btn { background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.28); font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
     .back-btn:hover { color: rgba(255,255,255,0.65); }
     .back-arrow { font-size: 15px; line-height: 1; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
   </style>
 </head>
 <body class="select-none">
 
-  <!-- Veils -->
   <div id="entry-veil"></div>
-  <div id="wipe-wrap" id="wipe-wrap"></div>
+  <div id="wipe-wrap"></div>
   <div id="exit-veil"></div>
   <div id="flash"></div>
 
-  <!-- BG -->
   <div id="bg-wrap">
     <div id="bg-a"></div>
     <div id="bg-b"></div>
@@ -266,7 +165,9 @@
       </div>
       <div>
         <!-- <div class="text-[10px] font-mono text-white/28 tracking-[0.2em] uppercase">Portfolio</div> -->
+         <a href="certificates.html"> <divclass="text-base font-semibold tracking-tight leading-tight">
         <div class="text-base font-semibold tracking-tight leading-tight">Certificates</div>
+        </a>
       </div>
     </div>
     <div class="flex items-center gap-5 text-white/28 text-[11px] font-mono tracking-wider">
@@ -289,7 +190,7 @@
     <div id="detail-inner">
       <div style="flex:1; min-width:0;">
         <div class="flex items-center gap-2.5 mb-2">
-          <span class="text-[10px] font-mono text-white/35 tracking-[0.18em] uppercase" id="d-category"></span>
+          <span class="text-[10px] font-mono text-white/35 tracking-[0.18em] uppercase" id="d-issuer"></span>
           <span class="year-badge" id="d-year"></span>
         </div>
         <h1 class="text-5xl font-bold leading-none tracking-tight mb-3" id="d-title">—</h1>
@@ -310,75 +211,102 @@
   <!-- Modal -->
   <div id="modal">
     <div id="modal-card">
-      <div class="flex items-center gap-3 mb-5">
-        <span class="text-[10px] font-mono text-white/35 tracking-[0.18em] uppercase" id="m-category"></span>
-        <span class="year-badge" id="m-year"></span>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="text-[10px] font-mono text-white/35 tracking-[0.18em] uppercase" id="m-issuer"></span>
+          <span class="year-badge" id="m-year"></span>
+        </div>
+        <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.35);font-size:18px;line-height:1;padding:4px 8px;border-radius:6px;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.75)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">✕</button>
       </div>
-      <h2 class="text-3xl font-bold mb-4 tracking-tight" id="m-title"></h2>
-      <p class="text-white/60 text-sm leading-relaxed mb-5" id="m-desc"></p>
-      <div class="flex flex-wrap gap-2 mb-7" id="m-tags"></div>
-      <div class="flex gap-3 flex-wrap items-center">
-        <a id="m-link" href="#" class="px-5 py-2.5 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition">View Live ↗</a>
-        <a id="m-github" href="#" class="px-5 py-2.5 rounded-full border border-white/20 text-white/75 text-sm font-medium hover:border-white/50 transition">GitHub</a>
-        <button onclick="closeModal()" class="ml-auto px-5 py-2.5 rounded-full border border-white/10 text-white/35 text-sm hover:border-white/25 transition">✕ Close</button>
+      <div id="m-img-wrap" style="width:100%;border-radius:12px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+        <img id="m-img" src="" alt="" style="width:100%;height:auto;display:block;max-height:72vh;object-fit:contain;" />
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; gap:12px;">
+        <div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:2px;" id="m-title"></div>
+         
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-  // ══ DATA ═══════════════════════════════════════════════════════════════
-  const projects = [
+  const certificates = [
     {
-      title: "Nova Dashboard", category: "Web App", year: "2024",
-      desc: "A real-time analytics dashboard for SaaS metrics with customizable widgets and dark-mode-first design.",
-      tags: ["React", "TypeScript", "Recharts", "Tailwind"],
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
-      thumb: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&q=80",
-      link: "#", github: "#"
+      title: "Full Stack Web Development",
+      issuer: "Municipal Information and Communication Technlogy Office Angono",
+      year: "2025",
+      credentialId: "null",
+      desc: "This training has equipped the participant with essential knowledge and practical skills in front-end and back-end web development, preparing them for future endeavors in the field of web technologies.",
+      tags: ["HTML", "CSS", "JavaScript", "Tailwind CSS", "ES6 Functional JavaScript", "Basic PHP", "Object-Oriented PHP", "MVC", "Laravel Basics" ],
+      image: "src/images/certificates/fullstack.png",
+      certImage: "src/images/certificates/fullstack_cert.png",
+      thumb: "src/images/certificates/fullstack_logo.png",
+      link: "#"
     },
     {
-      title: "Orbital Store", category: "E-Commerce", year: "2024",
-      desc: "Full-stack e-commerce platform with animated product reveals, cart persistence, and Stripe checkout.",
-      tags: ["Next.js", "Stripe", "Prisma", "PostgreSQL"],
-      image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&q=80",
-      thumb: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300&q=80",
-      link: "#", github: "#"
+      title: "Data Mastery with PYTHON: Practical Analytics and Visualization",
+      issuer: "Unified Computer Society",
+      year: "2024",
+      credentialId: "Null",
+      desc: "This seminar equipped participants with hands-on skills in Python programming, practical analytics, and data visualization techniques, empowering them to make data-driven decisions effectively.",
+      tags: ["Python"],
+      image: "src/images/certificates/python.png",
+      certImage: "src/images/certificates/python_cert.png",
+      thumb: "src/images/certificates/python_logo.png",
+      link: "#"
     },
     {
-      title: "Pulse Health", category: "Mobile App", year: "2023",
-      desc: "Cross-platform health tracker featuring biometric syncing, AI insights, and motion-based UI.",
-      tags: ["React Native", "Expo", "HealthKit", "AI"],
-      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&q=80",
-      thumb: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=300&q=80",
-      link: "#", github: "#"
+      title: "Harnessing the Data Advantage: Transforming Challenges into Opportunities",
+      issuer: "Unified Computer Society",
+      year: "2024",
+      credentialId: null,
+      desc: "Given on 17th day of May 2024, to gain knowledge and inspire to continue the journey in the realm of data analytic.",
+      tags: ["Data Analytics"],
+      image: "src/images/certificates/dataMastery.png",
+      certImage: "src/images/certificates/dataMastery_cert.png",
+      thumb: "src/images/certificates/dataMastery_logo.png",
+      link: "#"
     },
     {
-      title: "Luma 3D", category: "Creative", year: "2023",
-      desc: "Interactive 3D product configurator built with Three.js — rotate, texture, and export in real time.",
-      tags: ["Three.js", "WebGL", "GSAP", "Blender"],
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-      thumb: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=80",
-      link: "#", github: "#"
+      title: "Cyber Hygiene Training",
+      issuer: "APAC Cybersecurity Fund",
+      year: "2026",
+      credentialId: null,
+      desc: "Certification of Completion for completing Cyber Hygiene Training.",
+      tags: ["Cyber Hygiene"],
+      image: "src/images/certificates/hygiene.png",
+      certImage: "src/images/certificates/hygiene_cert.jpg",
+      thumb: "src/images/certificates/hygiene_logo.png",
+      
+      link: "#"
     },
-    {
-      title: "Cipher Chat", category: "Fullstack", year: "2023",
-      desc: "End-to-end encrypted messaging app with disappearing messages, group rooms, and WebSocket sync.",
-      tags: ["Node.js", "Socket.io", "MongoDB", "Crypto"],
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80",
-      thumb: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&q=80",
-      link: "#", github: "#"
-    },
-    {
-      title: "Terrain Gen", category: "Experiment", year: "2022",
-      desc: "Procedural terrain generator using Perlin noise — export heightmaps and fly-through in browser.",
-      tags: ["Canvas API", "WebGL", "Algorithms", "Vanilla JS"],
-      image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=80",
-      thumb: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300&q=80",
-      link: "#", github: "#"
-    },
+    // {
+    //   title: "Scrum Master Certified",
+    //   issuer: "Scrum Alliance",
+    //   year: "2023",
+    //   credentialId: "CSM-2023-00512",
+    //   desc: "Certification in Agile project management and Scrum frameworks — sprint planning, retrospectives, and cross-functional team facilitation.",
+    //   tags: ["Agile", "Scrum", "Project Mgmt", "Leadership"],
+    //   image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80",
+    //   certImage: "src/images/certificates/hygiene_cert.jpg",
+    //   thumb: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=300&q=80",
+    //   link: "#"
+    // },
+    // {
+    //   title: "DeepLearning.AI TensorFlow",
+    //   issuer: "DeepLearning.AI",
+    //   year: "2022",
+    //   credentialId: "DL-TF-2022-1198",
+    //   desc: "4-course specialization on building and deploying neural networks using TensorFlow — CNNs, NLP, sequences, and time series.",
+    //   tags: ["TensorFlow", "Deep Learning", "NLP", "Python"],
+    //   image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&q=80",
+    //   certImage: "src/images/certificates/hygiene_cert.jpg",
+    //   thumb: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=300&q=80",
+    //   link: "#"
+    // },
   ];
 
-  // ══ STATE ══════════════════════════════════════════════════════════════
   let active = 0, bgFlip = false;
   let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 
@@ -392,19 +320,18 @@
   const flash    = document.getElementById('flash');
   const wipeWrap = document.getElementById('wipe-wrap');
 
-  // ══ BUILD SHELF ════════════════════════════════════════════════════════
-  projects.forEach((p, i) => {
+  // Build shelf
+  certificates.forEach((c, i) => {
     const dot = document.createElement('div');
     dot.className = 'dot' + (i === 0 ? ' active' : '');
     dot.id = 'dot-' + i;
     navDots.appendChild(dot);
 
     const card = document.createElement('div');
-    card.className = 'game-card';
+    card.className = 'cert-card';
     card.id = 'card-' + i;
-    // stagger delay for entry reveal
     card.style.transitionDelay = `${i * 55}ms`;
-    card.innerHTML = `<img src="${p.thumb}" alt="${p.title}" loading="lazy"/><div class="card-label">${p.title}</div>`;
+    card.innerHTML = `<img src="${c.thumb}" alt="${c.title}" loading="lazy"/><div class="card-label">${c.title}</div>`;
     card.addEventListener('click', () => {
       if (active === i) openModal(i);
       else setActive(i);
@@ -414,54 +341,24 @@
 
   document.getElementById('btn-open').addEventListener('click', () => openModal(active));
 
-  // ══ PS5-STYLE ENTRY SEQUENCE ═══════════════════════════════════════════
+  // Entry sequence
   function runEntryAnimation() {
-    // 1. First, load the initial BG behind the veil
-    bgA.style.backgroundImage = `url('${projects[0].image}')`;
+    bgA.style.backgroundImage = `url('${certificates[0].image}')`;
     bgA.style.opacity = '1';
-
-    // 2. After a tiny breath, shoot horizontal wipe lines across screen
-    setTimeout(() => {
-      spawnWipeLines();
-    }, 80);
-
-    // 3. Lift the black veil
-    setTimeout(() => {
-      document.getElementById('entry-veil').classList.add('lifted');
-    }, 220);
-
-    // 4. Slide in topbar
-    setTimeout(() => {
-      document.getElementById('topbar').classList.add('show');
-    }, 480);
-
-    // 5. Slide in shelf wrapper
-    setTimeout(() => {
-      document.getElementById('shelf-wrapper').classList.add('show');
-    }, 580);
-
-    // 6. Pop each card in with stagger
-    setTimeout(() => {
-      document.querySelectorAll('.game-card').forEach(c => c.classList.add('revealed'));
-    }, 680);
-
-    // 7. Slide up detail panel
-    setTimeout(() => {
-      setActive(0); // sets data + triggers detail show
-    }, 900);
+    setTimeout(() => spawnWipeLines(), 80);
+    setTimeout(() => document.getElementById('entry-veil').classList.add('lifted'), 220);
+    setTimeout(() => document.getElementById('topbar').classList.add('show'), 480);
+    setTimeout(() => document.getElementById('shelf-wrapper').classList.add('show'), 580);
+    setTimeout(() => document.querySelectorAll('.cert-card').forEach(c => c.classList.add('revealed')), 680);
+    setTimeout(() => setActive(0), 900);
   }
 
-  // Horizontal wipe lines — PS5 swoosh effect
   function spawnWipeLines() {
-    const lineCount = 6;
-    const positions = [0.12, 0.28, 0.44, 0.58, 0.72, 0.88];
-    positions.forEach((pos, i) => {
+    [0.12, 0.28, 0.44, 0.58, 0.72, 0.88].forEach((pos, i) => {
       const line = document.createElement('div');
       line.className = 'wipe-line';
       line.style.top = (pos * 100) + 'vh';
       wipeWrap.appendChild(line);
-
-      // Animate: shoot right then fade
       setTimeout(() => {
         line.style.transition = 'left 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease 0.45s';
         line.style.left = '100%';
@@ -471,16 +368,13 @@
     });
   }
 
-  // ══ SET ACTIVE ═════════════════════════════════════════════════════════
   function setActive(idx) {
     const prev = active;
     active = idx;
-
     if (idx !== prev) {
       flash.classList.add('pop');
       setTimeout(() => flash.classList.remove('pop'), 140);
     }
-
     document.getElementById('card-' + prev)?.classList.remove('active');
     document.getElementById('card-' + idx)?.classList.add('active');
     document.getElementById('dot-' + prev)?.classList.remove('active');
@@ -495,9 +389,8 @@
     updateDetail(idx);
   }
 
-  // ══ CROSSFADE BG ═══════════════════════════════════════════════════════
   function crossfadeBg(idx) {
-    const url = `url('${projects[idx].image}')`;
+    const url = `url('${certificates[idx].image}')`;
     if (!bgFlip) {
       bgB.style.backgroundImage = url;
       requestAnimationFrame(() => { bgB.style.opacity = '1'; bgA.style.opacity = '0'; });
@@ -508,39 +401,35 @@
     bgFlip = !bgFlip;
   }
 
-  // ══ DETAIL ═════════════════════════════════════════════════════════════
   function updateDetail(idx) {
-    const p = projects[idx];
-    // quick fade out
+    const c = certificates[idx];
     detail.classList.remove('show');
     detail.classList.add('hide');
     setTimeout(() => {
-      document.getElementById('d-category').textContent = p.category;
-      document.getElementById('d-year').textContent = p.year;
-      document.getElementById('d-title').textContent = p.title;
-      document.getElementById('d-desc').textContent = p.desc;
-      document.getElementById('d-tags').innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
+      document.getElementById('d-issuer').textContent = c.issuer;
+      document.getElementById('d-year').textContent = c.year;
+      document.getElementById('d-title').textContent = c.title;
+      document.getElementById('d-desc').textContent = c.desc;
+      document.getElementById('d-tags').innerHTML = c.tags.map(t => `<span class="tag">${t}</span>`).join('');
       detail.classList.remove('hide');
       detail.classList.add('show');
     }, 180);
   }
 
-  // ══ MODAL ══════════════════════════════════════════════════════════════
   function openModal(idx) {
-    const p = projects[idx];
-    document.getElementById('m-category').textContent = p.category;
-    document.getElementById('m-year').textContent = p.year;
-    document.getElementById('m-title').textContent = p.title;
-    document.getElementById('m-desc').textContent = p.desc;
-    document.getElementById('m-tags').innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
-    document.getElementById('m-link').href = p.link;
-    document.getElementById('m-github').href = p.github;
+    const c = certificates[idx];
+    document.getElementById('m-issuer').textContent = c.issuer;
+    document.getElementById('m-year').textContent = c.year;
+    document.getElementById('m-title').textContent = c.title;
+    const img = document.getElementById('m-img');
+    img.src = c.certImage ;
+    img.alt = c.title;
     modal.classList.add('open');
   }
   window.closeModal = () => modal.classList.remove('open');
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
-  // ══ PARALLAX ═══════════════════════════════════════════════════════════
+  // Parallax
   document.addEventListener('mousemove', e => {
     mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
     mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -552,29 +441,28 @@
     requestAnimationFrame(loop);
   })();
 
-  // ══ KEYBOARD ═══════════════════════════════════════════════════════════
+  // Keyboard
   document.addEventListener('keydown', e => {
     if (modal.classList.contains('open')) { if (e.key === 'Escape') closeModal(); return; }
-    if (e.key === 'ArrowRight') setActive(Math.min(active + 1, projects.length - 1));
+    if (e.key === 'ArrowRight') setActive(Math.min(active + 1, certificates.length - 1));
     if (e.key === 'ArrowLeft')  setActive(Math.max(active - 1, 0));
     if (e.key === 'Enter' || e.key === ' ') openModal(active);
   });
 
-  // ══ BACK NAV ═══════════════════════════════════════════════════════════
+  // Back nav
   window.goBack = function() {
     const veil = document.getElementById('exit-veil');
     veil.classList.add('active');
-    setTimeout(() => { window.location.href = 'index.html'; }, 580);
+    setTimeout(() => { window.location.hrefhref = 'index.html'; }, 580);
   };
 
-  // ══ CLOCK ══════════════════════════════════════════════════════════════
+  // Clock
   const clockEl = document.getElementById('clock');
   (function tickClock() {
     clockEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setTimeout(tickClock, 10000);
   })();
 
-  // ══ BOOT ═══════════════════════════════════════════════════════════════
   runEntryAnimation();
   </script>
 </body>
