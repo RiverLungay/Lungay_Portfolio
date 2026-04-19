@@ -142,12 +142,14 @@
     .cat-database  .skill-chip-dot { background: #fb923c; }
     .cat-tools     .skill-chip-dot { background: #f472b6; }
     .cat-tech      .skill-chip-dot { background: #38bdf8; }
+    .cat-os      .skill-chip-dot { background: #f83892; }
 
     .cat-frontend  .skill-chip { border-color: rgba(129,140,248,0.20); }
     .cat-backend   .skill-chip { border-color: rgba(52,211,153,0.20); }
     .cat-database  .skill-chip { border-color: rgba(251,146,60,0.20); }
     .cat-tools     .skill-chip { border-color: rgba(244,114,182,0.20); }
     .cat-tech      .skill-chip { border-color: rgba(56,189,248,0.20); }
+    .cat-os      .skill-chip { border-color: rgba(248, 56, 130, 0.2); }
 
     /* ══ SKILLS MODAL OVERRIDE — dark pill header ══ */
     #modal-skills-header {
@@ -396,7 +398,7 @@
     <div id="modal-card">
       <!-- Skills header (shown only for skills card) -->
       <div id="modal-skills-header">
-        <div class="skills-modal-badge">⬡ Tech Stack</div>
+       
       </div>
 
       <!-- Standard header (hidden for skills card) -->
@@ -438,12 +440,12 @@
     frontend: {
       label: 'Frontend',
       icon: '◈',
-      items: ['HTML', 'CSS', 'JavaScript', 'Tailwind CSS', 'Bootstrap', 'Blade (Laravel)']
+      items: ['HTML', 'CSS', 'JavaScript', 'TypeScript', 'Tailwind CSS',  'Angular']
     },
     backend: {
       label: 'Backend',
       icon: '◉',
-      items: ['PHP', 'Laravel', 'Flask (Python)', 'REST API', 'Node.js']
+      items: ['PHP', 'Laravel', 'Flask']
     },
     database: {
       label: 'Database',
@@ -453,12 +455,17 @@
     tools: {
       label: 'Tools & Platforms',
       icon: '◆',
-      items: ['Git', 'GitHub', 'Android Studio', 'VS Code', 'Postman', 'Figma']
+      items: ['Git', 'GitHub', 'Android Studio', 'Visual Studio Code', 'Postman', 'SSMS', 'Cisco', 'PowerBI', 'Excel']
     },
     tech: {
       label: 'Languages & Technologies',
       icon: '◎',
-      items: ['Java', 'C++', 'Python', 'OpenGL (GLUT)', 'Android SDK']
+      items: ['Java', 'C++', 'Python', 'C#', "VB.net"]
+    },
+    os: {
+      label: 'Operating System',
+      icon: '◎',
+      items: ['Windows', 'Ubuntu & Mint Linux']
     }
   };
 
@@ -467,10 +474,10 @@
   const skillsEntry = {
     _isSkills: true,
     title: "Technical Skills",
-    category: "Stack",
+    category: "Skills",
     year: "2026",
-    desc: "A full overview of my technical toolkit — from frontend interfaces to backend systems, mobile development, and the tools I use daily.",
-    tags: ["Frontend", "Backend", "Database", "Tools", "Mobile"],
+    desc: "A short summary of my technical skills as a full-stack developer",
+    tags: ["Frontend", "Backend", "Database", "Tools", "Languages", "Operating System"],
     image: null, // skills card uses animated bg for the main BG too
     thumb: null,
     link: null,
